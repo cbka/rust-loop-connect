@@ -17,8 +17,8 @@ Distributed under **GPL-2.0-or-later**; see [LICENSE](LICENSE) and [NOTICE.md](N
 | Identify EK Connect and HID interface 0 | Verified on Linux |
 | Query all six fan channels | Verified; current test device reports 0 RPM on each |
 | Read configured PWM targets | Verified on Linux |
-| Identify disconnected T1–T3 (`0xe7`) | Verified; all three inputs currently disconnected |
-| Read actual attached temperature probe | Not yet tested |
+| Identify disconnected T1–T3 (`0xe7`) | Verified, including removal of the T2 probe |
+| Read actual attached temperature probe | All three inputs exercised on Linux; T2-to-T3 probe move verified |
 | Linux hwmon driver on kernel 7.0.0-42-generic | Build verification recorded in validation document |
 | Physical fan speed changes | Not yet tested |
 | Ubuntu fancontrol configuration | Requires installed driver, connected probes/fans and confirmed mapping |

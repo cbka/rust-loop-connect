@@ -40,3 +40,7 @@ Remote CI results are recorded by GitHub Actions; local checks do not substitute
 ## Remote CI completed
 
 [GitHub Actions run 42405616779](https://github.com/cbka/ek-loop-connect/actions/runs/42405616779) completed successfully for initial commit ee292eb: protocol tests on windows-latest and ubuntu-latest, and linux-module build. The Windows job uses mocked transport; no physical Windows HID access was tested.
+
+## Temperature channel checks on physical probes
+
+2026-11-07: The owner confirmed probes connected to T1 and T2. Repeated status requests returned T1=26 C, T2=27 C, T3 unavailable. After the owner moved the T2 probe to T3, three sequential samples returned [28, unavailable, 27], [28, unavailable, 27], [27, unavailable, 27] C. All three temperature input channels and absent-probe detection have therefore been exercised through the Linux raw HID tool. This verifies channel routing and plausible readouts, not calibrated temperature accuracy or kernel hwmon integration.
