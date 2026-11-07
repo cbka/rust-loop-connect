@@ -36,3 +36,7 @@ No continuously running services, containers or Docker volumes are created by th
 - Publication scan: no local USB serial, private key, token or workstation path in tracked source.
 
 Remote CI results are recorded by GitHub Actions; local checks do not substitute for executing Windows hardware checks.
+
+## Remote CI completed
+
+[GitHub Actions run 42405616779](https://github.com/cbka/ek-loop-connect/actions/runs/42405616779) completed successfully for initial commit ee292eb: protocol tests on windows-latest and ubuntu-latest, and linux-module build. The Windows job uses mocked transport; no physical Windows HID access was tested.
