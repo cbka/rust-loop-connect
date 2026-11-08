@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
 use anyhow::{Context, Result, bail};
-use ek_loop_desktop::{
+use rust_loop_connect::{
     device,
     gui::{self, GuiOptions},
     service,
@@ -10,7 +10,7 @@ use std::path::PathBuf;
 
 fn main() {
     if let Err(error) = run() {
-        eprintln!("EK Loop Connect: {error:#}");
+        eprintln!("Rust Loop Connect: {error:#}");
         std::process::exit(1);
     }
 }
@@ -58,9 +58,13 @@ fn run() -> Result<()> {
                     .context("--height benötigt eine Zahl")?
                     .parse::<f32>()?
             }
+            "--version" | "-V" => {
+                println!("Rust Loop Connect {}", env!("CARGO_PKG_VERSION"));
+                return Ok(());
+            }
             "--help" | "-h" => {
                 println!(
-                    "EK Loop Connect\n\nOhne Argumente: Desktop-Anwendung\n--list: Geräte anzeigen\n--status [--device INDEX]: echte Messwerte lesen\n--demo: Oberfläche ohne Hardware ausprobieren\n--demo --capture DATEI.png [--width 960 --height 720]: GUI-Prüfaufnahme\n"
+                    "Rust Loop Connect\n\nOhne Argumente: Desktop-Anwendung\n--list: Geräte anzeigen\n--status [--device INDEX]: echte Messwerte lesen\n--demo: Oberfläche ohne Hardware ausprobieren\n--demo --capture DATEI.png [--width 960 --height 720]: GUI-Prüfaufnahme\n"
                 );
                 return Ok(());
             }
@@ -100,7 +104,7 @@ fn run() -> Result<()> {
     }
     if demo && (list || status) {
         if list {
-            println!("0: EK Loop Connect · Demo");
+            println!("0: Rust Loop Connect · Demo");
         } else {
             println!(
                 "{}",
@@ -116,7 +120,7 @@ fn run() -> Result<()> {
                 println!("{i}: {}", item.name);
             }
             if devices.is_empty() {
-                println!("Kein EK Connect gefunden.");
+                println!("Kein unterstützter USB-Controller gefunden.");
             }
             return Ok(());
         }

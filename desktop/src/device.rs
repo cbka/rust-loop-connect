@@ -3,7 +3,7 @@
 //! Protocol facts: pavelherr/ek-loop-connect and OpenRGB EKController.
 //! Do not use concurrently with a kernel hwmon driver or unrelated RGB tools.
 #[cfg(not(any(target_os = "linux", target_os = "windows")))]
-compile_error!("EK Loop Desktop supports Linux and Windows only.");
+compile_error!("Rust Loop Connect supports Linux and Windows only.");
 
 use crate::protocol::{self, DeviceSnapshot, FanStatus, RgbSettings};
 use anyhow::{Result, anyhow, ensure};
@@ -63,7 +63,7 @@ pub fn discover() -> Result<Vec<DeviceInfo>> {
         .enumerate()
         .map(|(i, id)| DeviceInfo {
             id,
-            name: format!("EK Loop Connect {}", i + 1),
+            name: format!("USB-Controller {}", i + 1),
         })
         .collect())
 }
@@ -73,7 +73,7 @@ pub fn connect(info: &DeviceInfo) -> Result<Box<dyn Controller>> {
     let d = api
         .device_list()
         .find(|d| matches_device(d) && d.path().to_str().ok() == Some(info.id.as_str()))
-        .ok_or_else(|| anyhow!("Der ausgewählte EK-Controller ist nicht mehr verfügbar."))?;
+        .ok_or_else(|| anyhow!("Der ausgewählte USB-Controller ist nicht mehr verfügbar."))?;
     // A serial is required rather than inventing an incompatible lock identity.
     let identity = d.serial_number().filter(|s| !s.is_empty()).ok_or_else(|| {
         anyhow!("Controller ohne Seriennummer: sichere gemeinsame Gerätesperre nicht möglich.")

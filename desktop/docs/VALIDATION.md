@@ -33,6 +33,14 @@ No installer/custom vendor DLL was run, no proprietary source or assets copied, 
 - Read-only status queries with the native optimized Linux binary succeeded against the connected controller. No live PWM/RGB writes were sent by the Rust acceptance run.
 - Rendered native demo windows were inspected at960x720 and1280x900; curve editor and lighting pages, plus empty/loading/error/permission presentation states were also captured. A keyboard Tab-focus test and four-page rendering tests passed. Simulated UI states are labeled demo and do not prove operating-system permission/hotplug behavior.
 - Independent final review found no remaining critical blocker after the shutdown-queue regression and nonzero fan-metadata handling were corrected.
-- [Initial native CI run 42432593897](https://github.com/cbka/ek-loop-connect/actions/runs/42432593897) passed Linux and Windows tests, Clippy and optimized builds for commit b9d9d99. Later changes replace two UI arrow labels with text so they render legibly with the Linux fonts.
+- [Initial native CI run 42432593897](https://github.com/cbka/rust-loop-connect/actions/runs/42432593897) passed Linux and Windows tests, Clippy and optimized builds for commit b9d9d99. Later changes replace two UI arrow labels with text so they render legibly with the Linux fonts.
 
 The optional older installer was also checked: its EK.exe version1.0.0.9 is older than MSI application1.5.0.0. Both DLLs implement single-LED export names as immediate error stubs; no working per-pixel path was found in their actual UI call chains. This does not establish impossibility in unexamined device firmware.
+
+## Version 0.0.1 release preparation (2026-11-08)
+
+- Visible application branding is Rust Loop Connect; USB identity matching and the shared device lock remain unchanged.
+- Version output reports `Rust Loop Connect 0.0.1`. All 42 local tests, formatting, all-target Clippy and the optimized Linux build pass after the rename.
+- Three new 1280×900 demo captures (overview, curve editor, lighting) were visually inspected and embedded in the root README. Captures use defaults and simulated readings.
+- Previous development profiles can be read as drafts; saving uses the new application directory. Demo profiles are separate. No startup control commands were introduced.
+- Release acceptance requires the tag version to match Cargo, both native build/test jobs to pass, and exactly two raw binaries to be attached. Windows physical device acceptance remains pending.

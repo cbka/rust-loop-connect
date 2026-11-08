@@ -66,7 +66,7 @@ pub fn run(options: GuiOptions) -> eframe::Result<()> {
         ..Default::default()
     };
     eframe::run_native(
-        "EK Loop Connect",
+        &format!("Rust Loop Connect {}", env!("CARGO_PKG_VERSION")),
         native,
         Box::new(move |cc| {
             configure_style(&cc.egui_ctx);
@@ -141,19 +141,40 @@ struct Desktop {
     opened: Instant,
     auto_connected: bool,
     preview_state: Option<String>,
+    show_about: bool,
 }
 
 impl Desktop {
     fn new(options: GuiOptions, capture_result: CaptureResult) -> Self {
         let mut error = None;
         let profile_path = match config::profile_path() {
-            Ok(path) => Some(path),
+            Ok(path) => Some(if options.demo {
+                path.with_file_name("demo-profile.json")
+            } else {
+                path
+            }),
             Err(e) => {
                 error = Some(format!("Profilpfad: {e:#}"));
                 None
             }
         };
-        let profile = match profile_path.as_ref().filter(|p| p.exists()) {
+        let source_path = if options.capture_path.is_some() {
+            None
+        } else {
+            profile_path
+                .as_ref()
+                .filter(|p| p.exists())
+                .cloned()
+                .or_else(|| {
+                    if options.demo {
+                        None
+                    } else {
+                        config::legacy_profile_path().filter(|p| p.exists())
+                    }
+                })
+        };
+        let migrated = source_path.is_some() && source_path.as_ref() != profile_path.as_ref();
+        let profile = match source_path.as_ref() {
             Some(path) => match config::load(path) {
                 Ok(profile) => profile,
                 Err(e) => {
@@ -193,7 +214,11 @@ impl Desktop {
             profile,
             profile_path,
             curves_active: false,
-            notice: "Keine Regelung gestartet. Änderungen zunächst als Entwurf.".into(),
+            notice: if migrated {
+                "Vorhandenes Profil als Entwurf übernommen. Mit Speichern im neuen Profilordner ablegen.".into()
+            } else {
+                "Keine Regelung gestartet. Änderungen zunächst als Entwurf.".into()
+            },
             error,
             capture_path: options.capture_path,
             capture_requested: None,
@@ -202,6 +227,7 @@ impl Desktop {
             opened: Instant::now(),
             auto_connected: preview_state.is_some(),
             preview_state,
+            show_about: false,
         }
     }
 
@@ -256,8 +282,11 @@ impl Desktop {
         egui::TopBottomPanel::top("header").show(ctx, |ui| {
             egui::Frame::new().inner_margin(18).show(ui, |ui| {
                 ui.horizontal(|ui| {
-                    ui.label(RichText::new("EK / LOOP CONNECT").strong().size(22.0));
+                    ui.label(RichText::new("RUST LOOP CONNECT").strong().size(22.0));
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        if ui.button("Info").clicked() {
+                            self.show_about = true;
+                        }
                         if self.demo {
                             ui.label(
                                 RichText::new("DEMO · simulierte Daten")
@@ -359,6 +388,46 @@ impl Desktop {
                     ui.add_space(12.0);
                 });
         });
+        let profile_path = self.profile_path.clone();
+        egui::Window::new("Über Rust Loop Connect")
+            .open(&mut self.show_about)
+            .resizable(false)
+            .show(ctx, |ui| {
+                ui.heading(format!("Rust Loop Connect {}", env!("CARGO_PKG_VERSION")));
+                ui.label("Unabhängige Open-Source-Anwendung für Linux und Windows.");
+                ui.label("Lüfter, Temperaturfühler und gemeinsame RGB-Effekte steuern.");
+                ui.separator();
+                ui.label("Protokollgrundlagen: Pavel Herrmann und OpenRGB.");
+                ui.label("Lizenz: GPL-2.0-or-later.");
+                ui.label("github.com/cbka/rust-loop-connect");
+                if ui
+                    .add_enabled(
+                        profile_path.is_some(),
+                        egui::Button::new("Lizenzhinweise speichern"),
+                    )
+                    .clicked()
+                    && let Some(parent) = profile_path.as_ref().and_then(|p| p.parent())
+                {
+                    let path = parent.join("LICENSE-NOTICES.txt");
+                    let notices = concat!(
+                        include_str!("../../LICENSE"),
+                        "\n\n",
+                        include_str!("../licenses/THIRD-PARTY-NOTICES.txt")
+                    );
+                    match std::fs::create_dir_all(parent)
+                        .and_then(|()| std::fs::write(&path, notices))
+                    {
+                        Ok(()) => {
+                            self.notice = format!("Lizenzhinweise gespeichert: {}", path.display())
+                        }
+                        Err(e) => {
+                            self.error = Some(format!(
+                                "Lizenzhinweise konnten nicht gespeichert werden: {e}"
+                            ))
+                        }
+                    }
+                }
+            });
     }
 
     fn overview(&mut self, ui: &mut egui::Ui) {

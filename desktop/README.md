@@ -1,4 +1,4 @@
-# EK Loop Desktop
+# Rust Loop Connect
 
 Native open-source **Rust desktop application for Linux and Windows**, with a German interface. Kubuntu is the first hardware test system. This is a new controller application, not a binary port of EK's proprietary .NET software. It uses the OS HID driver directly, with no vendor DLL or installed Python required.
 
@@ -15,7 +15,7 @@ The proprietary CPUID SDK, CPU/GPU telemetry integration, firmware flashing, ble
 
 ## Run
 
-Start the `ek-loop-desktop` binary on Linux or `ek-loop-desktop.exe` on Windows. With a single available controller, the app connects and queries its readings. It does not program fan or RGB settings on startup. If several matching controllers are found, choose one explicitly.
+Start the `rust-loop-connect` binary on Linux or `rust-loop-connect.exe` on Windows. With a single available controller, the app connects and queries its readings. It does not program fan or RGB settings on startup. If several matching controllers are found, choose one explicitly.
 
 ```sh
 # Developer build and start

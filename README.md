@@ -1,8 +1,31 @@
-# EK Loop Connect — Rust desktop app and Linux hwmon driver
+# Rust Loop Connect
 
-Open-source EK-Loop Connect support for **Linux and Windows**. The [native Rust desktop application](desktop/README.md) provides a German dashboard, temperatures/RPM, manual PWM, temperature curves, global RGB effects and local profiles. Kubuntu is the first hardware test target.
+**Rust Loop Connect** is an independent, open-source desktop application for monitoring and controlling USB cooling hardware on **Linux and Windows**. It currently supports the EK-Loop Connect controller. The [native Rust desktop application](desktop/README.md) provides a German dashboard, temperatures/RPM, manual PWM, temperature curves, global RGB effects and local profiles. Kubuntu is the first hardware test target.
 
 The [Linux hwmon driver](linux/README.md) remains available for standard `fancontrol`, and the Python tool supplies portable diagnostics. Use one controller client at a time. No curve starts automatically, and physical fan calibration/Windows hardware acceptance remain pending; see the desktop validation record for the exact tested scope.
+
+## Download 0.0.1
+
+- [Linux x86_64](https://github.com/cbka/rust-loop-connect/releases/download/v0.0.1/rust-loop-connect-linux-x86_64)
+- [Windows x86_64](https://github.com/cbka/rust-loop-connect/releases/download/v0.0.1/rust-loop-connect-windows-x86_64.exe)
+
+On Linux, make the downloaded file executable with `chmod +x rust-loop-connect-linux-x86_64`, then run it. Windows users can start the `.exe` directly. See [setup and device permissions](desktop/README.md) and the [release notes](desktop/docs/releases/0.0.1.md).
+
+## Screenshots
+
+The following screenshots show the German interface in **demo mode with simulated readings**.
+
+### Overview
+
+![Rust Loop Connect overview](desktop/docs/screenshots/overview.png)
+
+### Temperature curves
+
+![Temperature curve editor](desktop/docs/screenshots/curve.png)
+
+### Lighting
+
+![Global lighting controls](desktop/docs/screenshots/lighting.png)
 
 ## Credits and license
 
@@ -28,13 +51,9 @@ Distributed under **GPL-2.0-or-later**; see [LICENSE](LICENSE) and [NOTICE.md](N
 | Global RGB effects | Implemented in the Rust desktop app; earlier script tests verified global effects |
 | SW, EXT | Outside the implemented device controls |
 
-## F6 uses the pump channel
-
-The inherited F6 address `0xa1e0` matches the original EK Connect application's pump/F6 path. A complete static trace on 2026-11-08 shows that the application reads five generic fan channels and routes F6 through `GetPump`/`SetPump`. The generic SDK slot 6 at `0xa140` is not used for physical F6 by that application. Our earlier discrepancy warning was based on an incomplete call trace and is withdrawn. The original table is unchanged; physical fan response testing remains pending.
-
 ## Desktop application
 
-See [desktop/README.md](desktop/README.md) for native Linux/Windows builds, permissions, controls and profile behavior. The workflow publishes native binaries as GitHub Actions artifacts. Source and protocol work credit Pavelherr and OpenRGB; vendor binaries are not included.
+See [desktop/README.md](desktop/README.md) for native Linux/Windows builds, permissions, controls and profile behavior. Tagged releases publish native Linux and Windows binaries. Source and protocol work credit Pavelherr and OpenRGB; vendor binaries are not included.
 
 ## Quick start (Python diagnostics)
 

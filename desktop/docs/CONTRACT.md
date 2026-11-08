@@ -54,5 +54,5 @@ GUI:
 2. cargo fmt --check, cargo test, cargo clippy --all-targets -- -D warnings; local debug/release Linux builds.
 3. CLI list/status query actual EK on Kubuntu; no writes until attached fan is confirmed. Record actual readings, do not claim physical PWM acceptance from a mock.
 4. Native demo screenshots at960x720 and1280x900 plus error/partial states; inspect images, labels, overflow and keyboard focus. Evidence gate truthful, pending states do not become fabricated PASS.
-5. CI native Linux/Windows builds+tests with artifacts. Source public in cbka/ek-loop-connect, no original vendor binaries/decompilation. Package Linux binary with desktop launcher; Windows artifact build evidence separate from hardware acceptance.
+5. CI native Linux/Windows builds+tests with artifacts. Source public in cbka/rust-loop-connect, no original vendor binaries/decompilation. Package Linux binary with desktop launcher; Windows artifact build evidence separate from hardware acceptance.
 6. User-facing report distinguishes finished implementation/builds from pending Windows controller test and physical fan/curve calibration. No unrequested background service/autostart. Stop created QA processes; retain only explicitly delivered app.

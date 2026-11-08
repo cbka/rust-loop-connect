@@ -1,10 +1,10 @@
 [package]
-name = "ek-loop-desktop"
-version = "0.1.0"
+name = "rust-loop-connect"
+version = "0.0.1"
 edition = "2024"
 rust-version = "1.88"
 license = "GPL-2.0-or-later"
-description = "Native EK Loop Connect controller for Linux and Windows"
+description = "Rust Loop Connect: native USB cooling controller for Linux and Windows"
 
 [dependencies]
 anyhow = "1.0"

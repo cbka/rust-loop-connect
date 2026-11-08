@@ -147,7 +147,7 @@ impl Worker {
         let found = if self.demo {
             Ok(vec![DeviceInfo {
                 id: "demo".into(),
-                name: "EK Loop Connect · Demo".into(),
+                name: "Rust Loop Connect · Demo".into(),
             }])
         } else {
             device::discover()

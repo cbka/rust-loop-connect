@@ -1,0 +1,181 @@
+name: Release Linux and Windows binaries
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-linux:
+    name: Build Linux x86_64
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      RELEASE_TAG: ${{ github.ref_name }}
+      RELEASE_FILENAME: rust-loop-connect-linux-x86_64
+    defaults:
+      run:
+        shell: bash
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify package version matches tag
+        run: |
+          python - <<'PY'
+          import os, tomllib
+          with open("Cargo.toml", "rb") as source:
+              version = tomllib.load(source)["package"]["version"]
+          expected = "v" + version
+          if os.environ["RELEASE_TAG"] != expected:
+              raise SystemExit("Release tag must match Cargo package version: " + expected)
+          print("Validated release version " + version)
+          PY
+      - name: Install Linux build libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential pkg-config libx11-dev libxkbcommon-dev libwayland-dev libgl1-mesa-dev
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: Record compiler
+        run: rustc --version --verbose
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Run tests without hardware
+        run: cargo test --locked --all-targets
+      - name: Clippy
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: Build native release
+        run: cargo build --locked --release
+      - name: Name raw release binary
+        run: |
+          python - <<'PY'
+          import json, os, pathlib, shutil, subprocess
+          metadata = json.loads(subprocess.check_output(["cargo", "metadata", "--locked", "--no-deps", "--format-version", "1"], text=True))
+          binaries = [target["name"] for package in metadata["packages"] for target in package["targets"] if "bin" in target["kind"]]
+          if len(binaries) != 1:
+              raise SystemExit("Expected exactly one desktop binary target")
+          binary = pathlib.Path("target/release") / (binaries[0] + (".exe" if os.name == "nt" else ""))
+          shutil.copy2(binary, binary.parent / os.environ["RELEASE_FILENAME"])
+          PY
+      - name: Upload Linux release input
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-linux
+          path: desktop/target/release/rust-loop-connect-linux-x86_64
+          if-no-files-found: error
+          retention-days: 7
+
+  build-windows:
+    name: Build Windows x86_64
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      RELEASE_TAG: ${{ github.ref_name }}
+      RELEASE_FILENAME: rust-loop-connect-windows-x86_64.exe
+    defaults:
+      run:
+        shell: bash
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify package version matches tag
+        run: |
+          python - <<'PY'
+          import os, tomllib
+          with open("Cargo.toml", "rb") as source:
+              version = tomllib.load(source)["package"]["version"]
+          expected = "v" + version
+          if os.environ["RELEASE_TAG"] != expected:
+              raise SystemExit("Release tag must match Cargo package version: " + expected)
+          print("Validated release version " + version)
+          PY
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: Record compiler
+        run: rustc --version --verbose
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Run tests without hardware
+        run: cargo test --locked --all-targets
+      - name: Clippy
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: Build native release
+        run: cargo build --locked --release
+      - name: Name raw release binary
+        run: |
+          python - <<'PY'
+          import json, os, pathlib, shutil, subprocess
+          metadata = json.loads(subprocess.check_output(["cargo", "metadata", "--locked", "--no-deps", "--format-version", "1"], text=True))
+          binaries = [target["name"] for package in metadata["packages"] for target in package["targets"] if "bin" in target["kind"]]
+          if len(binaries) != 1:
+              raise SystemExit("Expected exactly one desktop binary target")
+          binary = pathlib.Path("target/release") / (binaries[0] + (".exe" if os.name == "nt" else ""))
+          shutil.copy2(binary, binary.parent / os.environ["RELEASE_FILENAME"])
+          PY
+      - name: Upload Windows release input
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-windows
+          path: desktop/target/release/rust-loop-connect-windows-x86_64.exe
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish two raw binaries
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download both verified build inputs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: release-assets
+          merge-multiple: true
+      - name: Verify exactly two expected raw files
+        shell: bash
+        run: |
+          python - <<'PY'
+          import pathlib
+          directory = pathlib.Path("release-assets")
+          expected = {"rust-loop-connect-linux-x86_64", "rust-loop-connect-windows-x86_64.exe"}
+          entries = list(directory.iterdir())
+          if {entry.name for entry in entries} != expected or not all(entry.is_file() and entry.stat().st_size > 0 for entry in entries):
+              raise SystemExit("Release must contain exactly the two nonempty native binaries")
+          PY
+          chmod 0755 release-assets/rust-loop-connect-linux-x86_64
+      - name: Create release without overwriting an existing release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create "$RELEASE_TAG" \
+            --verify-tag \
+            --title "Rust Loop Connect ${RELEASE_TAG#v}" \
+            --notes-file desktop/docs/releases/0.0.1.md \
+            --latest \
+            release-assets/rust-loop-connect-linux-x86_64 \
+            release-assets/rust-loop-connect-windows-x86_64.exe

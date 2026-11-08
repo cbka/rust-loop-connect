@@ -29,12 +29,12 @@ jobs:
         include:
           - name: Linux x86_64
             os: ubuntu-24.04
-            artifact: ek-loop-desktop-linux-x86_64
-            binary: desktop/target/release/ek-loop-desktop
+            artifact: rust-loop-connect-linux-x86_64
+            binary: desktop/target/release/rust-loop-connect
           - name: Windows x86_64
             os: windows-latest
-            artifact: ek-loop-desktop-windows-x86_64
-            binary: desktop/target/release/ek-loop-desktop.exe
+            artifact: rust-loop-connect-windows-x86_64
+            binary: desktop/target/release/rust-loop-connect.exe
     defaults:
       run:
         working-directory: desktop

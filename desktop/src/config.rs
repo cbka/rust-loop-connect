@@ -130,7 +130,7 @@ pub(crate) fn validate_points(points: &[CurvePoint]) -> Result<()> {
 /// Resolve the native per-user configuration directory without creating it.
 pub fn profile_path() -> Result<PathBuf> {
     let directories =
-        directories::ProjectDirs::from("io.github.cbka", "EKLoopConnect", "EK Loop Connect")
+        directories::ProjectDirs::from("io.github.cbka", "RustLoopConnect", "Rust Loop Connect")
             .context("Cannot determine the current user's configuration directory")?;
     Ok(directories.config_dir().join("profile.json"))
 }
@@ -229,6 +229,12 @@ pub fn save(path: &Path, profile: &Profile) -> Result<()> {
         .and_then(|directory| directory.sync_all())
         .context("Profile was saved, but its directory could not be flushed")?;
     Ok(())
+}
+
+/// Read-only location for profiles from the earlier local development build.
+pub fn legacy_profile_path() -> Option<std::path::PathBuf> {
+    directories::ProjectDirs::from("io.github.cbka", "EKLoopConnect", "EK Loop Connect")
+        .map(|dirs| dirs.config_dir().join("profile.json"))
 }
 
 #[cfg(test)]
