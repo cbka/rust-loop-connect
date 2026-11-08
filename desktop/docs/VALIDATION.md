@@ -26,3 +26,13 @@ A local Windows-target cargo check is available. Native Windows CI builds/tests 
 - Verify flow/level physical sensors and calibration before displaying interpreted engineering values.
 
 No installer/custom vendor DLL was run, no proprietary source or assets copied, and no service/autostart or Docker resources created.
+
+## Integration checks completed
+
+- 42 local Rust tests passed; formatting and all-target Clippy with warnings treated as errors passed. Native optimized Linux build passed.
+- Read-only status queries with the native optimized Linux binary succeeded against the connected controller. No live PWM/RGB writes were sent by the Rust acceptance run.
+- Rendered native demo windows were inspected at960x720 and1280x900; curve editor and lighting pages, plus empty/loading/error/permission presentation states were also captured. A keyboard Tab-focus test and four-page rendering tests passed. Simulated UI states are labeled demo and do not prove operating-system permission/hotplug behavior.
+- Independent final review found no remaining critical blocker after the shutdown-queue regression and nonzero fan-metadata handling were corrected.
+- [Initial native CI run 42432593897](https://github.com/cbka/ek-loop-connect/actions/runs/42432593897) passed Linux and Windows tests, Clippy and optimized builds for commit b9d9d99. Later changes replace two UI arrow labels with text so they render legibly with the Linux fonts.
+
+The optional older installer was also checked: its EK.exe version1.0.0.9 is older than MSI application1.5.0.0. Both DLLs implement single-LED export names as immediate error stubs; no working per-pixel path was found in their actual UI call chains. This does not establish impossibility in unexamined device firmware.

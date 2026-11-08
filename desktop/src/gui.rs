@@ -556,11 +556,9 @@ impl Desktop {
                             }
                         });
                     ui.label(
-                        RichText::new(
-                            "Fehlender oder ungültiger Fühler → 100 % für aktive Kurven.",
-                        )
-                        .color(AMBER)
-                        .small(),
+                        RichText::new("Fehlender oder ungültiger Fühler: 100 % für aktive Kurven.")
+                            .color(AMBER)
+                            .small(),
                     );
                     curve_chart(ui, &fan.points);
                     let mut remove = None;
@@ -648,7 +646,7 @@ impl Desktop {
             if ui
                 .add_enabled(
                     self.curves_active,
-                    egui::Button::new("Kurven stoppen → 100 %"),
+                    egui::Button::new("Kurven stoppen (100 %)"),
                 )
                 .clicked()
             {

@@ -43,7 +43,7 @@ for Windows. GUI builds use eframe's Glow backend with Linux X11/Wayland support
 | `cargo clippy --lib -- -D warnings` | Passed | The library passed the local static checks. |
 | `cargo check --locked --target x86_64-pc-windows-gnu` | Passed | Windows-specific code and dependencies type-check from Linux. This did not link or execute a Windows binary. |
 | Workflow YAML parsing | Passed | YAML parsed; two runners and read-only contents permission checked. This is not an executed GitHub Actions run. |
-| Native Windows build and tests | Pending CI result | Only a successful native Windows job establishes this build/test result. |
+| Native Windows build and tests | Passed in initial CI run 42432593897 | Native Windows tests, Clippy and optimized build succeeded for b9d9d99; this is not hardware acceptance. |
 | Real Windows EK controller | Not tested | No Windows HID discovery, sensor, PWM or RGB hardware acceptance is established. |
 
 Linux desktop rendering, full-project checks and read-only hardware acceptance are
