@@ -26,6 +26,10 @@ Distributed under **GPL-2.0-or-later**; see [LICENSE](LICENSE) and [NOTICE.md](N
 | Windows Fan Control plugin / GUI | Planned, not implemented |
 | RGB, SW, EXT | Outside the first milestone |
 
+## Channel mapping under investigation
+
+Static analysis of the original EK Connect 1.5 USB library on 2026-11-08 found channel 6 mapped to `0xa140` in its fan read and fan-data-write builders. The inherited upstream table uses `0xa1e0` for its sixth entry. Physical F6 routing is therefore **unverified**; do not use the currently named F6 output for control until a known test fan confirms the mapping. An acknowledged query does not establish physical port identity. This is documented evidence of a discrepancy, not yet a hardware-verified correction.
+
 ## Quick start
 
 Read [Linux installation and fancontrol notes](linux/README.md) for the kernel integration. Use the diagnostic tool first if the kernel driver is **not** bound to interface 0:

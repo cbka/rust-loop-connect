@@ -44,3 +44,7 @@ Remote CI results are recorded by GitHub Actions; local checks do not substitute
 ## Temperature channel checks on physical probes
 
 2026-11-07: The owner confirmed probes connected to T1 and T2. Repeated status requests returned T1=26 C, T2=27 C, T3 unavailable. After the owner moved the T2 probe to T3, three sequential samples returned [28, unavailable, 27], [28, unavailable, 27], [27, unavailable, 27] C. All three temperature input channels and absent-probe detection have therefore been exercised through the Linux raw HID tool. This verifies channel routing and plausible readouts, not calibrated temperature accuracy or kernel hwmon integration.
+
+## F6 routing discrepancy identified, 2026-11-08
+
+Static analysis of the user-supplied original EK Connect 1.5 USB library found channel 6 uses 0xa140 in both GetFan and SetFanData packet builders. The inherited upstream sixth channel is 0xa1e0. Earlier raw HID responses using that upstream table must not be represented as proof of physical F6 identity. Confirm with a known attached fan before controlling F6. No table change or new hardware write was made during static analysis. Proprietary binaries and decompiled source are not published.
