@@ -26,9 +26,9 @@ Distributed under **GPL-2.0-or-later**; see [LICENSE](LICENSE) and [NOTICE.md](N
 | Windows Fan Control plugin / GUI | Planned, not implemented |
 | RGB, SW, EXT | Outside the first milestone |
 
-## Channel mapping under investigation
+## F6 uses the pump channel
 
-Static analysis of the original EK Connect 1.5 USB library on 2026-11-08 found channel 6 mapped to `0xa140` in its fan read and fan-data-write builders. The inherited upstream table uses `0xa1e0` for its sixth entry. Physical F6 routing is therefore **unverified**; do not use the currently named F6 output for control until a known test fan confirms the mapping. An acknowledged query does not establish physical port identity. This is documented evidence of a discrepancy, not yet a hardware-verified correction.
+The inherited F6 address `0xa1e0` matches the original EK Connect application's pump/F6 path. A complete static trace on 2026-11-08 shows that the application reads five generic fan channels and routes F6 through `GetPump`/`SetPump`. The generic SDK slot 6 at `0xa140` is not used for physical F6 by that application. Our earlier discrepancy warning was based on an incomplete call trace and is withdrawn. The original table is unchanged; physical fan response testing remains pending.
 
 ## Quick start
 
