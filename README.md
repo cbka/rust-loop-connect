@@ -1,8 +1,8 @@
-# EK Loop Connect — Linux hwmon and portable control tools
+# EK Loop Connect — Rust desktop app and Linux hwmon driver
 
-Open-source support for the EK-Loop Connect fan controller. The first goal is six PWM/RPM channels and three external temperature inputs in Ubuntu's `hwmon` / `fancontrol`. A portable Python tool also provides a starting point for Windows support.
+Open-source EK-Loop Connect support for **Linux and Windows**. The [native Rust desktop application](desktop/README.md) provides a German dashboard, temperatures/RPM, manual PWM, temperature curves, global RGB effects and local profiles. Kubuntu is the first hardware test target.
 
-**Development snapshot, not a completed fan-control installation.** Hardware status queries work on Linux. Kernel installation, physical PWM response and Windows runtime acceptance remain pending. No automatic fan curve is enabled by this repository.
+The [Linux hwmon driver](linux/README.md) remains available for standard `fancontrol`, and the Python tool supplies portable diagnostics. Use one controller client at a time. No curve starts automatically, and physical fan calibration/Windows hardware acceptance remain pending; see the desktop validation record for the exact tested scope.
 
 ## Credits and license
 
@@ -23,14 +23,20 @@ Distributed under **GPL-2.0-or-later**; see [LICENSE](LICENSE) and [NOTICE.md](N
 | Physical fan speed changes | Not yet tested |
 | Ubuntu fancontrol configuration | Requires installed driver, connected probes/fans and confirmed mapping |
 | Windows Python/HIDAPI transport | Implemented experimental path; real Windows device test pending |
-| Windows Fan Control plugin / GUI | Planned, not implemented |
-| RGB, SW, EXT | Outside the first milestone |
+| Native Rust Linux/Windows GUI | Implemented; see desktop/ for exact validation |
+| Windows Fan Control plugin | Separate future integration, not required by the Rust app |
+| Global RGB effects | Implemented in the Rust desktop app; earlier script tests verified global effects |
+| SW, EXT | Outside the implemented device controls |
 
 ## F6 uses the pump channel
 
 The inherited F6 address `0xa1e0` matches the original EK Connect application's pump/F6 path. A complete static trace on 2026-11-08 shows that the application reads five generic fan channels and routes F6 through `GetPump`/`SetPump`. The generic SDK slot 6 at `0xa140` is not used for physical F6 by that application. Our earlier discrepancy warning was based on an incomplete call trace and is withdrawn. The original table is unchanged; physical fan response testing remains pending.
 
-## Quick start
+## Desktop application
+
+See [desktop/README.md](desktop/README.md) for native Linux/Windows builds, permissions, controls and profile behavior. The workflow publishes native binaries as GitHub Actions artifacts. Source and protocol work credit Pavelherr and OpenRGB; vendor binaries are not included.
+
+## Quick start (Python diagnostics)
 
 Read [Linux installation and fancontrol notes](linux/README.md) for the kernel integration. Use the diagnostic tool first if the kernel driver is **not** bound to interface 0:
 

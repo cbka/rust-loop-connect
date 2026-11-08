@@ -1,0 +1,3 @@
+# Grant the active local desktop session access to EK Connect HID interfaces.
+# VID/PID alone are shared by unrelated products; keep the product check.
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5750", ATTRS{product}=="EK Connect*", TAG+="uaccess"

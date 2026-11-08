@@ -9,3 +9,5 @@ __pycache__/
 *.symvers
 .*.cmd
 .tmp_versions/
+
+desktop/target/

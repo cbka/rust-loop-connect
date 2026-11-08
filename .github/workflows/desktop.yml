@@ -1,0 +1,68 @@
+name: Desktop Linux and Windows
+
+on:
+  push:
+    paths:
+      - "desktop/**"
+      - ".github/workflows/desktop.yml"
+  pull_request:
+    paths:
+      - "desktop/**"
+      - ".github/workflows/desktop.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux x86_64
+            os: ubuntu-24.04
+            artifact: ek-loop-desktop-linux-x86_64
+            binary: desktop/target/release/ek-loop-desktop
+          - name: Windows x86_64
+            os: windows-latest
+            artifact: ek-loop-desktop-windows-x86_64
+            binary: desktop/target/release/ek-loop-desktop.exe
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Linux build libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential pkg-config libx11-dev libxkbcommon-dev libwayland-dev libgl1-mesa-dev
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: Record compiler
+        run: rustc --version --verbose
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Run unit tests without hardware
+        run: cargo test --locked --all-targets
+      - name: Clippy
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: Build native release
+        run: cargo build --locked --release
+      - name: Upload native binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.binary }}
+          if-no-files-found: error
+          retention-days: 14
